@@ -1,0 +1,19 @@
+{
+  "name": "soctalk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ajaysehwal/soctalk.git",
+  "author": "ajaysehwal <ajaysehwal000@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"yarn running-web\" \"yarn running-server-auth\" \"yarn running-server-messages\"",
+    "running-web": "cd apps/web && yarn dev",
+    "running-server-auth": "cd apps/servers/auth && yarn dev",
+    "running-server-messages": "cd apps/servers/messages && yarn dev"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
