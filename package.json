@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"yarn running-web\" \"yarn running-server-auth\" \"yarn running-server-messages\"",
+    "install":"concurrently \"cd apps/web && yarn\" \"cd apps/servers/auth && yarn\" \"cd apps/servers/messages && yarn\"",
     "running-web": "cd apps/web && yarn dev",
     "running-server-auth": "cd apps/servers/auth && yarn dev",
     "running-server-messages": "cd apps/servers/messages && yarn dev"
