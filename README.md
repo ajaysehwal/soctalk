@@ -1,11 +1,6 @@
 # soctalk
 SocTalk is a dynamic and user-friendly chat application designed to strengthen the social connections between friends
 
-const readmeContent = `
-# Soctalk
-
-![Soctalk Logo](link_to_your_logo.png)
-
 ## Table of Contents
 
 - [Description](#description)
@@ -24,16 +19,17 @@ Soctalk is a project that provides [brief description of your project].
 
 To get started with the project, follow these steps:
 
-\`\`\`bash
+```bash
 # Clone the repository
 git clone https://github.com/ajaysehwal/soctalk.git
 
 # Navigate to the project directory
 cd soctalk
 
+```bash
 # Install dependencies
 yarn install
-\`\`\`
+
 
 ## Usage
 
