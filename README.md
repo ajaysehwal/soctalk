@@ -18,28 +18,24 @@ Soctalk is a project that provides [brief description of your project].
 ## Installation
 
 To get started with the project, follow these steps:
-
-```bash
 # Clone the repository
+```bash
 git clone https://github.com/ajaysehwal/soctalk.git
 ```
-
-```bash
 # Navigate to the project directory
+```bash
 cd soctalk
 ```
 ## Installation
 To install the project in development mode, use the following command:
-
-```bash
 # Install dependencies
+```bash
 yarn install
 ```
 ## Usage
 To run the project in development mode, use the following command:
-
-```bash
 #  Run project
+```bash
 yarn install
 ```
 
