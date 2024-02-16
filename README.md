@@ -36,6 +36,6 @@ yarn install
 To run the project in development mode, use the following command:
 #  Run project
 ```bash
-yarn install
+yarn dev
 ```
 
