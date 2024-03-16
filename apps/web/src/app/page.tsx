@@ -1,6 +1,10 @@
-import Main from "./components/main";
-import { SocketProvider } from "./context";
-export default function Home() {
+"use client";
+import { SocketProvider } from "./context/socketProvider";
 
-  return  <SocketProvider> <Main /> </SocketProvider>;
+export default function Home() {
+  return (
+    <SocketProvider>
+      <main className="flex min-h-screen flex-col items-center justify-between p-24"></main>
+    </SocketProvider>
+  );
 }

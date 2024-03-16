@@ -1,12 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    SERVER_HOST: "http://localhost:8000/",
-    Security_Key:"qwerrtyuiop!@$soctalk//===jwtscript$",
-    Socket_Server:'http://localhost:7000'
-  },
-  skipMiddlewareUrlNormalize: true,
-
+    env:{
+        SERVER_URL:"http://localhost:8000",
+        AUTH_HEADER:"X-Authorization",
+        ACCESS_TOKEN:'jwt'
+    }
 };
 
 export default nextConfig;

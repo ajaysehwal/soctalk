@@ -1,35 +1,46 @@
-import { Cookies } from "../services";
-import { useEffect, useMemo, useState } from "react";
-import jwt from "jsonwebtoken";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { userStore } from "../zustand";
+import { configureAxios } from "../libs";
+import { useSocket } from ".";
+
 interface User {
   username: string;
-  id: string;
+  id?: string;
 }
-export const useUser = (): User => {
-  const [user, setUser] = useState<User>({ username: "", id: "" });
 
-  const getUser = useMemo(
-    () => async () => {
-      try {
-        const cookies = new Cookies();
-        const token = cookies.getCookie("access_token");
-        if (token) {
-          const decoded = jwt.decode(token);
-          const { username, userId }: any = decoded;
-          const neededValues = { username, id: userId };
-          setUser(neededValues);
-        } else {
-          throw new Error("Unable to find access_token");
+export const useUser = (): User | undefined => {
+  const ACCESS_TOKEN = process.env.ACCESS_TOKEN || "";
+  const access_token = Cookies.get(ACCESS_TOKEN);
+  const { user, setUser } = userStore();
+  const [connections, setConnection] = useState([]);
+  const fetchUser = async (token: string | undefined): Promise<void> => {
+    try {
+      if (token) {
+        const decodedData = jwt.decode(token) as JwtPayload | null;
+
+        if (decodedData) {
+          const { username, id } = decodedData;
+          setUser({ username, id });
         }
-      } catch (err: any) {
-        throw new Error(err.message);
+      } else {
+        setUser({ username: "" });
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
 
+  const getUserConnections = () => {};
+ 
   useEffect(() => {
-    getUser();
-  }, [getUser]);
+    configureAxios(access_token);
+    const fetchData = async (): Promise<void> => {
+      await fetchUser(access_token);
+    };
+    fetchData();
+  }, [access_token, setUser]);
+
   return user;
 };

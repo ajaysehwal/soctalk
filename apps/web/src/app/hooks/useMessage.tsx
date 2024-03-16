@@ -1,22 +1,74 @@
 "use client";
-import { useContext, useState } from "react";
-import { SocketContext } from "../context";
+import { useCallback, useEffect, useState } from "react";
+import { useSocket } from "./useSocket";
+import { useUser } from "./useUser";
+import { useScroller } from "./useScroller";
+
+export interface MessagesDataI {
+  _id: string;
+  content: string;
+  sender: string;
+  recipient: string;
+  timestamp: any;
+  createdAt: any;
+  updatedAt: any;
+  __v: number;
+}
 
 export const useMessage = () => {
-  const { socket }: any = useContext(SocketContext);
-  const [response, setResponse] = useState<string>("");
-  const sendMessage = (message:string) => {
-    if (socket) {
-      socket.emit("message", message);
-      getResponse();
-    } else {
-      throw new Error("sockets are not connected");
-    }
-  };
-  const getResponse = () => {
-    socket.on("message", (msg: string) => {
-      setResponse(msg);
+  const { handleScroll } = useScroller();
+  const socket = useSocket();
+  const user = useUser();
+  const [messages, setMessages] = useState<MessagesDataI[]>([]);
+  const [messagesLoad, setMessagesLoad] = useState<boolean>(false);
+
+  const sendMessage = useCallback(
+    (data: {
+      content: string;
+      sender: string | undefined;
+      recipient: string | string[];
+    }) => {
+      if (data) {
+        socket?.emit("sendMessage", data, (response: any) => {
+          console.log("Message sent:", response);
+        });
+      }
+    },
+    [socket]
+  );
+
+  const getAllMessages = useCallback(
+    (recipientId: string | string[]) => {
+      setMessagesLoad(true);
+    const check=  socket?.emit("requestMessages", recipientId, (messages: any) => {
+        console.log("AllMessages",messages)
+        setMessages(messages);
+        setMessagesLoad(false);
+        handleScroll();
+      });
+      console.log("chekcer",check);
+    },
+    [socket]
+  );
+
+
+  useEffect(() => {
+   const handleReceivedMessage = (newMessage: any) => {
+    setMessages((prev) => {
+      const previousMessages = Array.isArray(prev) ? prev : [];
+      return [...previousMessages, newMessage];
     });
-  };
-  return { sendMessage, response };
+      handleScroll();
+    };
+
+    socket?.on("receivedMessage", handleReceivedMessage);
+    socket?.on("getMessage", handleReceivedMessage);
+
+    return () => {
+      socket?.off("receivedMessage", handleReceivedMessage);
+      socket?.off("getMessage", handleReceivedMessage);
+    };
+  }, [socket, handleScroll]);
+
+  return { sendMessage, getAllMessages, messages, messagesLoad };
 };

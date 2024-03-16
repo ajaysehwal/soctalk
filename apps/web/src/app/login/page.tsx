@@ -1,65 +1,134 @@
+// pages/login.tsx
 "use client";
-import React, { useEffect } from "react";
-import Loginform from "./components/form";
-import { Button } from "@/components/ui/button";
-import { GoogleSVG, Logo } from "../utils";
-import { useAuth } from "../hooks";
+import React, { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-
-export default function Login() {
+import axios, { AxiosError, AxiosResponse } from "axios";
+import Link from "next/link";
+const LoginPage: React.FC = () => {
+  axios.defaults.baseURL = "http://localhost:8000";
+  axios.defaults.withCredentials = true;
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
-  useEffect(()=>{
-    if (isAuthenticated()) {
-      router.push("/", { scroll: false });
-    }
-  },[])
-  
-  return (
-    <div
-      className="h-[100vh] "
-      style={{
-        backgroundImage:
-          "linear-gradient( 111.4deg, rgba(238,113,113,1) 1%, rgba(246,215,148,1) 58% )",
-      }}
-    >
-      <Logo />
-      <main className="w-full max-w-md mx-auto p-6">
-        <div className="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-4 sm:p-7">
-            <div className="text-center">
-              <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                Sign in
-              </h1>
-            </div>
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
-            <div className="mt-5">
-              <Loginform />
-              <div className="py-3 flex items-center text-xs text-gray-400 uppercase before:flex-[1_1_0%] before:border-t before:border-gray-200 before:me-6 after:flex-[1_1_0%] after:border-t after:border-gray-200 after:ms-6 dark:text-gray-500 dark:before:border-gray-600 dark:after:border-gray-600">
-                Or
-              </div>
-              <Button
-                type="button"
-                className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-              >
-                <GoogleSVG />
-                Sign in with Google
-              </Button>
-            </div>
-            <div className="text-center">
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Don't have an account yet?
-                <a
-                  className="text-blue-600 decoration-2 hover:underline font-medium dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                  href="/register"
+    handleLogin({ username, password });
+  };
+  const handleLogin = (data: { username: string; password: string }) => {
+    axios
+      .post("/login", data)
+      .then((response: AxiosResponse) => {
+        const { token } = response.data;
+        alert("Login Successfully");
+        localStorage.setItem("token", token);
+        router.push("/");
+      })
+      .catch((error: AxiosError) => {
+        console.error("Login failed:", error);
+      });
+  };
+  return (
+    <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <a
+          href="#"
+          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          SocTalk Local
+        </a>
+        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+              Welcome back
+            </h1>
+            <form
+              className="space-y-4 md:space-y-6"
+              method="post"
+              onSubmit={(e) => onSubmit(e)}
+            >
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Sign up here
-                </a>
+                  Your email
+                </label>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  type="text"
+                  name="email"
+                  id="email"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="John Singh"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Password
+                </label>
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="••••••••"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="terms"
+                    aria-describedby="terms"
+                    type="checkbox"
+                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label
+                    htmlFor="terms"
+                    className="font-light text-gray-500 dark:text-gray-300"
+                  >
+                    I accept the{" "}
+                    <a
+                      className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                      href="#"
+                    >
+                      Terms and Conditions
+                    </a>
+                  </label>
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+              >
+                Login
+              </button>
+              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                Don't have an account?{" "}
+                <Link
+                  href="/register"
+                  shallow={true}
+                  className="font-medium text-primary-600 hover:underline dark:text-primary-500"
+                >
+                  Register here
+                </Link>
               </p>
-            </div>
+            </form>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   );
-}
+};
+
+export default LoginPage;
