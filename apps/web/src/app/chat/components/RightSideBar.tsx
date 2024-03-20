@@ -47,13 +47,11 @@ export default function RightSideBar() {
         </Button>
       </Box>
       <motion.div
-        className={`fixed top-10 ${
+        className={`fixed top-3 ${
           toggle && "w-[150px]"
         } right-0 h-[80vh] bg-blue-200 rounded-full  border-l py-10 px-5 transition-all duration-500 ease-in-out`}
       >
         <div className="flex flex-col gap-2">
-          <NotificationButton toggle={toggle} />
-
           <FindUserButton toggle={toggle} />
         </div>
       </motion.div>

@@ -16,7 +16,6 @@ export default function ChatSection() {
   const { handleScroll } = useScroller();
   const selectedUser = selectedRecipient(id);
   const socket = useSocket();
-  const [togglebtn,setTogglebtn]=useState<boolean>(false);
   const { getAllMessages, messages, messagesLoad } = useMessage();
   useEffect(() => {
     if (id) {

@@ -34,6 +34,7 @@ export default function SidebarUsers() {
 
   const socket=useSocket();
   const [connection,setConnection]=useState<Users[]>([]);
+  
   const getConnections=()=>{
     socket?.on('getconnections',(connections:Users[])=>{
       setConnection(connections);
@@ -45,7 +46,6 @@ export default function SidebarUsers() {
      socket?.off('getconnections');
    }
   },[socket])
-  console.log("myConnection",connection);
   return (
     <ScrollArea>
       <div className="h-full">

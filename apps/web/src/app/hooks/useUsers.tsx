@@ -15,7 +15,7 @@ export const useUsers = () => {
     try {
       const response = await axios.get(`/users`);
       const users = response.data.response;
-      setUsers(users);
+      shuffleUsers(users);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -27,9 +27,16 @@ export const useUsers = () => {
     getAllUsers();
   }, [current_user]);
   const selectedRecipient = (recipientId: string | string[]) => {
-    const findrecipient=users.find((user) => user._id === recipientId);
-    return {username:findrecipient?.username,_id:findrecipient?._id}
-
+    const findrecipient = users.find((user) => user._id === recipientId);
+    return { username: findrecipient?.username, _id: findrecipient?._id };
   };
-  return { users, loading,selectedRecipient };
+  const shuffleUsers = (users: { username: string; _id: string }[]) => {
+    const newUsers = [...users];
+    for (let i = newUsers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newUsers[i], newUsers[j]] = [newUsers[j], newUsers[i]];
+    }
+    setUsers(newUsers);
+  };
+  return { users, loading, selectedRecipient };
 };

@@ -54,7 +54,7 @@ export default function Sidebar() {
                   <MenubarSeparator />
                   <MenubarItem>Share</MenubarItem>
                   <MenubarSeparator />
-                  <MenubarItem>Print</MenubarItem>
+                  <MenubarItem onClick={()=>handlelogOut()}>LogOut</MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
             </Menubar>

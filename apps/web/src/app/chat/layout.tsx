@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Chat from "./page";
 import { SocketProvider } from "../context/socketProvider";
 import RightSideBar from "./components/RightSideBar";
+import Notification from "./components/notification";
 export default function ChatSectionLayout() {
   const params = useParams();
   return (
@@ -15,6 +16,7 @@ export default function ChatSectionLayout() {
           {params.id ? <ChatSection /> : <Chat />}
         </div>
         <RightSideBar />
+        <Notification/>
       </div>
     </SocketProvider>
   );

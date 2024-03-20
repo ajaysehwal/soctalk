@@ -48,10 +48,11 @@ export const SearchDialogContent = () => {
     socket?.emit("connectionRequest", request);
     setRequestIndex(index)
   };
-  const RemoveConnection = () => {};
-
+ const HandleIfAlreadySend=()=>{
+    
+ }
   return (
-    <DialogContent className="gap-0 p-0 outline-none max-h-[525px]">
+    <DialogContent className="gap-0 p-0 pb-2 outline-none  lg:max-w-[50%] max-h-[525px]">
       <DialogHeader className="px-4 pb-4 pt-5">
         <DialogTitle>Make connections all around world</DialogTitle>
         <DialogDescription>

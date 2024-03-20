@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
         const { token } = response.data;
         localStorage.setItem("token", token);
         alert("Register Successfully")
-        router.push("/");
+        // router.push("/");
       })
       .catch((error: AxiosError) => {
         console.error("Login failed:", error);
