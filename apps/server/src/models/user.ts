@@ -32,10 +32,9 @@ const userSchema = new mongoose.Schema(
     },
     connections: [
       {
-        _id:String,
-        username:String,
+        _id: String,
+        username: String,
       },
-     
     ],
     connectionRequests: [
       {
@@ -77,7 +76,29 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    notifications: [
+      {
+        Type: {
+          type: String,
+          required: true,
+          enum: ["connection_request", "connection_response", "message", "like", "comment"],
+        },
+        notification: {
+          type: Object,
+          required: true,
+        },
+        isRead: {
+          type: Boolean,
+          default: false,
+        },
+        timestamp: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
+
   { timestamps: true }
 );
 

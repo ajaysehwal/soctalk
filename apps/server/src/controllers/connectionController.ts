@@ -1,5 +1,6 @@
 import { Socket } from "socket.io";
 import { User } from "../models";
+import { request } from "http";
 
 interface IRequest {
   RequestType: string;
@@ -48,21 +49,23 @@ export class ConnectionRequest {
           RequestType: request.RequestType,
           recipient: request.recipient,
         });
-
         Recipient.connectionRequests.push({
           sender: request.sender,
         });
+        const latestConnectionRequest = Recipient.connectionRequests.slice(-1)[0];
+        Recipient.notifications.push({
+          Type: "connection_request",
+          notification: latestConnectionRequest,
+        });
+        const notify = Recipient.notifications.slice(-1)[0];
 
+        console.log("notify------------", notify);
+        if (recipientSocket) {
+          this.socket.to(recipientSocket).emit("notification", notify);
+        }
         await Promise.all([Sender.save(), Recipient.save()]);
 
-        const latestRequest = Recipient.connectionRequests.slice(-1)[0];
-        if (recipientSocket) {
-          this.socket
-            .to(recipientSocket)
-            .emit("receivedConnectionRequest", latestRequest);
-        }
-
-        console.log("New connection request added:", latestRequest);
+        console.log("New connection request added:", notify);
       } catch (error) {
         console.error("Error handling connection request:", error);
         // Emit error event or handle error appropriately
@@ -70,46 +73,73 @@ export class ConnectionRequest {
     });
   }
 
-  private async handleAcceptRequest(): Promise<void> {
+  private async handleResponse(): Promise<void> {
     this.socket.on(
-      "acceptConnectionRequest",
-      async (data: { status: "Accepted"; _id: any; senderId: string }) => {
+      "ConnectionResponse",
+      async (data: { status: string; _id: any; senderId: string }) => {
         try {
-          const { senderId, _id } = data;
-
+          const { status, senderId, _id } = data;
           const [requestSender, requestAccepter] = await Promise.all([
             User.findById(senderId),
             User.findById(this.userId),
           ]);
-
           if (!requestSender || !requestAccepter) {
             throw new Error("Sender or accepter not found.");
           }
-
-          const requestDeleteFromAccepterIndex =
-            requestAccepter.connectionRequests.findIndex(
+          const requestAccepterRequestDeleteIndex =
+            requestAccepter?.connectionRequests.findIndex(
               (request) => String(request?._id) === _id
             );
-
-          if (requestDeleteFromAccepterIndex !== -1) {
+          if (requestAccepterRequestDeleteIndex !== -1) {
             requestAccepter.connectionRequests.splice(
-              requestDeleteFromAccepterIndex,
+              requestAccepterRequestDeleteIndex,
               1
             );
           }
+          const SenderRequestFind = requestSender?.myConnectionRequests.find(
+            (request) => String(request?.recipient?._id) === this.userId
+          );
+          const senderSocket = this.findRecipientSocket(senderId);
 
-          requestSender.connections.push({
-            _id: this.userId,
-            username: requestAccepter.username,
-          });
-          requestAccepter.connections.push({
-            _id: senderId,
-            username: requestSender.username,
-          });
-
+          if (status === "rejected") {
+            if (SenderRequestFind) {
+              SenderRequestFind.status = "rejected";
+              if (senderSocket) {
+                const notification = SenderRequestFind;
+                const notify = requestSender.notifications.push({
+                  Type: "connection_response",
+                  notification: notification,
+                });
+                this.socket.to(senderSocket).emit("notification", notify);
+              }
+            } else {
+              throw new Error("Not Found SenderRequest in database");
+            }
+          } else {
+            if (SenderRequestFind) {
+              SenderRequestFind.status = "accepted";
+              if (senderSocket) {
+                const notification = SenderRequestFind;
+                const notify = requestSender.notifications.push({
+                  Type: "connection_response",
+                  notification: notification,
+                });
+                this.socket.to(senderSocket).emit("notification", notify);
+              }
+              requestSender.connections.push({
+                _id: this.userId,
+                username: requestAccepter.username,
+              });
+              requestAccepter.connections.push({
+                _id: senderId,
+                username: requestSender.username,
+              });
+            }
+          }
           await Promise.all([requestSender.save(), requestAccepter.save()]);
+
           console.log(
-            "Connection request accepted and connection established."
+            "Connection request accept or decline upto users response and connection established."
           );
         } catch (error) {
           console.error("Error handling connection acceptance:", error);
@@ -119,13 +149,20 @@ export class ConnectionRequest {
   }
 
   private findRecipientSocket(recipientId: string): string | undefined {
-    return this.activeUsers.get(recipientId);
+    if (recipientId) {
+      return this.activeUsers.get(recipientId);
+    }
+    return undefined;
   }
-  // private sendNotificationAfterAccept(){
-  // }
+  private findSenderSocket(): string | undefined {
+    if (this.userId) {
+      return this.activeUsers.get(this.userId);
+    }
+    return undefined;
+  }
 
   private initMethods(): void {
     this.handleRequests();
-    this.handleAcceptRequest();
+    this.handleResponse();
   }
 }

@@ -24,21 +24,26 @@ export class UserController {
       return res.status(500).json({ response: "Internal Server Error" });
     }
   }
-  async UserDataProvider(Id: any,socket:Socket) {
+  public async UserDataProvider(Id: any,socket:Socket) {
     const user = await User.findById({ _id: Id });
-    this.getconnectionRequest(user,socket);
-    this.getConnections(user,socket);
+    if(user){
+      this.getconnectionRequest(user,socket);
+      this.getConnections(user,socket);
+      this.getMyConnectionRequest(user,socket);
+    }
+  
   }
-  async getconnectionRequest(user: any,socket:Socket) {
-    if (user) {
+  private getconnectionRequest(user: any,socket:Socket) {
       const data = user.connectionRequests;
        socket?.emit("getconnectionRequest", data);
-    }
   }
-  async getConnections(user: any,socket:Socket) {
-    if (user) {
+  private getConnections(user: any,socket:Socket) {
       const connections = user.connections;
       socket?.emit("getconnections", connections);
-    }
+  
+  }
+  private getMyConnectionRequest(user:any,socket:Socket){
+      const myConnectionRequest=user.myConnectionRequests;
+      console.log("myrequests",myConnectionRequest)
   }
 }
