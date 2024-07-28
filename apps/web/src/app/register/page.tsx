@@ -4,7 +4,7 @@ import React, { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-const LoginPage: React.FC = () => {
+const Register: React.FC = () => {
   axios.defaults.baseURL="http://localhost:8000";
   axios.defaults.withCredentials=true;
   const [username, setUsername] = useState<string>("");
